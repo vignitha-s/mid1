@@ -15,6 +15,9 @@ and learning new technologies.
 - CSS
 - Flutter
 - Git and GitHub
+- java
+- ![Static Badge](https://img.shields.io/badge/JAVA-ED8B00)
+
 
 ## Achievements
 - Learning programming
