@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Docker, Kubernetes and Selenium Lab Record</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--card:#f5f5f7;--red:#d32f2f;--blue:#1565c0;--bd:#ddd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--fg:#eee;--card:#22252b;--red:#ff6b6b;--blue:#7ab8ff;--bd:#3a3e46}}
+:root[data-theme="dark"]{--bg:#16181c;--fg:#eee;--card:#22252b;--red:#ff6b6b;--blue:#7ab8ff;--bd:#3a3e46}
+body{margin:0;padding:16px;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;max-width:820px;margin-inline:auto}
+h1{font-size:1.4rem}h2{margin-top:2rem;border-bottom:2px solid var(--bd)}h3{margin-bottom:.4rem}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:8px;margin:.6rem 0;overflow:hidden}
+.lab{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;font-weight:700;font-size:.85rem;border-bottom:1px solid var(--bd)}
+.n .lab,.n pre{color:var(--red)}.c .lab,.c pre{color:var(--blue)}
+pre{margin:0;padding:10px;overflow-x:auto;font:13px/1.45 ui-monospace,Consolas,monospace;font-weight:600}
+button{font:inherit;font-size:.8rem;padding:3px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
+.b{font-weight:700}.legend span{font-weight:700;margin-right:12px}
+</style></head><body>
+<h1>Docker, Kubernetes and Selenium Lab Record</h1>
+<p class="legend"><span style="color:var(--red)">RED = type in Notepad</span><span style="color:var(--blue)">BLUE = command</span></p>
+<p>Notepad: File → Save As → "Save as type: All Files" → exact file name shown, inside your folder (avoids a hidden .txt).</p>
+
+<h2>SET 1: DOCKER BASICS</h2>
+<h3>Q1(A) Pull image and list containers</h3>
+<xmp class="c">docker pull ubuntu
+docker images
+docker ps</xmp>
+<h3>Q1(B) Check Docker installation</h3>
+<xmp class="c">docker --version
+docker info
+docker run hello-world
+docker images
+docker ps -a</xmp>
+
+<h2>SET 2: DOCKERFILE AND IMAGE</h2>
+<h3>Q2(A) Simple Docker application</h3>
+<xmp class="c" data-f="create folder">mkdir dockerapp
+cd dockerapp</xmp>
+<xmp class="n" data-f="index.html">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Docker App</title>
+</head>
+<body>
+    <h1>Hello from Docker!</h1>
+</body>
+</html></xmp>
+<xmp class="n" data-f="Dockerfile (no extension)">
+FROM nginx:latest
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</xmp>
+<xmp class="c" data-f="build and run">docker build -t myapp .
+docker run -d -p 8080:80 --name mycontainer myapp</xmp>
+<p class="b">Browser: http://localhost:8080</p>
+<h3>Q2(B) Custom tag and port</h3>
+<xmp class="c">docker build -t myapp:v1 .
+docker images
+docker run -d -p 8081:80 --name mycontainer2 myapp:v1
+docker ps</xmp>
+<p class="b">Browser: http://localhost:8081</p>
+
+<h2>SET 3: KUBERNETES AND DOCKER</h2>
+<h3>Q3(A) Configure Kubernetes with Docker</h3>
+<p>First: Docker Desktop → Settings → Kubernetes → Enable Kubernetes → Apply</p>
+<xmp class="c" data-f="inside dockerapp folder">docker build -t myapp:v1 .
+kubectl version --client
+kubectl cluster-info
+kubectl get nodes</xmp>
+<xmp class="n" data-f="deployment.yaml">
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: myapp:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80</xmp>
+<xmp class="c">kubectl apply -f deployment.yaml
+kubectl get deployments
+kubectl get pods</xmp>
+<h3>Q3(B) Kubernetes setup script</h3>
+<xmp class="n" data-f="setup.sh">
+#!/bin/bash
+
+echo "Building Docker image"
+docker build -t myapp:v1 .
+
+echo "Checking Docker images"
+docker images
+
+echo "Deploying application"
+kubectl apply -f deployment.yaml
+
+echo "Checking pods"
+kubectl get pods
+
+echo "Setup completed"</xmp>
+<xmp class="c" data-f="Git Bash, same folder">bash setup.sh</xmp>
+
+<h2>SET 4: KUBERNETES DEPLOYMENT AND SERVICE</h2>
+<h3>Q4(A) Create deployment</h3>
+<xmp class="n" data-f="deployment.yaml">
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80</xmp>
+<xmp class="c">kubectl apply -f deployment.yaml
+kubectl get deployments
+kubectl get pods</xmp>
+<h3>Q4(B) Expose using Service</h3>
+<xmp class="n" data-f="service.yaml">
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080</xmp>
+<xmp class="c">kubectl apply -f service.yaml
+kubectl get services</xmp>
+<p class="b">Browser: http://localhost:30080</p>
+<xmp class="c" data-f="alternative access">kubectl port-forward service/nginx-service 8080:80</xmp>
+<p class="b">Browser: http://localhost:8080</p>
+
+<h2>SET 5: SELENIUM INSTALLATION AND WEBDRIVER</h2>
+<h3>Q5(A) Install Selenium</h3>
+<xmp class="c">pip install selenium
+pip show selenium</xmp>
+<xmp class="n" data-f="test.py">
+from selenium import webdriver
+
+driver = webdriver.Chrome()
+
+driver.get("https://www.google.com")
+
+print("Page Title:", driver.title)
+
+assert "Google" in driver.title
+
+driver.quit()</xmp>
+<xmp class="c">python test.py</xmp>
+<h3>Q5(B) Verify page title</h3>
+<xmp class="n" data-f="title_test.py">
+from selenium import webdriver
+
+driver = webdriver.Chrome()
+
+driver.get("https://www.google.com")
+
+title = driver.title
+print("Title:", title)
+
+if "Google" in title:
+    print("Test Passed")
+else:
+    print("Test Failed")
+
+driver.quit()</xmp>
+<xmp class="c">python title_test.py</xmp>
+
+<h2>SET 6: SELENIUM WITH JAVASCRIPT</h2>
+<h3>Q6(A) JavaScript test</h3>
+<xmp class="c">mkdir seleniumjs
+cd seleniumjs
+npm init -y
+npm install selenium-webdriver</xmp>
+<xmp class="n" data-f="test.js (inside seleniumjs)">
+const { Builder } = require('selenium-webdriver');
+
+async function test() {
+
+    let driver = await new Builder()
+        .forBrowser('chrome')
+        .build();
+
+    try {
+        await driver.get('https://www.google.com');
+
+        let title = await driver.getTitle();
+
+        console.log("Page Title:", title);
+
+        if (title.includes("Google")) {
+            console.log("Test Passed");
+        } else {
+            console.log("Test Failed");
+        }
+
+    } finally {
+        await driver.quit();
+    }
+}
+
+test();</xmp>
+<xmp class="c">node test.js</xmp>
+<h3>Q6(B) Locate element by ID and click</h3>
+<xmp class="n" data-f="button.html">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Test</title>
+</head>
+<body>
+
+    <h2>Click Button</h2>
+
+    <button id="submit">Submit</button>
+
+    <p id="result"></p>
+
+    <script>
+        document.getElementById("submit").onclick = function() {
+            document.getElementById("result").innerHTML =
+                "Button Clicked Successfully";
+        };
+    </script>
+
+</body>
+</html></xmp>
+<xmp class="n" data-f="click.js">
+const { Builder, By } = require('selenium-webdriver');
+
+async function test() {
+
+    let driver = await new Builder()
+        .forBrowser('chrome')
+        .build();
+
+    try {
+        await driver.get('http://localhost:8000/button.html');
+
+        let button = await driver.findElement(By.id('submit'));
+
+        await button.click();
+
+        console.log("Button clicked successfully");
+
+    } finally {
+        await driver.quit();
+    }
+}
+
+test();</xmp>
+<xmp class="c" data-f="CMD window 1, folder with button.html">python -m http.server 8000</xmp>
+<xmp class="c" data-f="CMD window 2, same folder">node click.js</xmp>
+
+<h2>SET 7: REGISTRATION FORM TESTING</h2>
+<p>Server steps are the same as Set 6.</p>
+<h3>Q7(A) Submit registration form</h3>
+<xmp class="n" data-f="registration.html">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+</head>
+<body>
+
+    <h2>Registration Form</h2>
+
+    <form id="form">
+        <input type="text" id="username"
+               placeholder="Enter Username">
+
+        <button type="submit" id="submit">
+            Register
+        </button>
+    </form>
+
+    <p id="success"></p>
+
+    <script>
+        document.getElementById("form").onsubmit =
+        function(event) {
+            event.preventDefault();
+
+            document.getElementById("success").innerHTML =
+                "Registration Successful";
+        };
+    </script>
+
+</body>
+</html></xmp>
+<xmp class="n" data-f="register.py">
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+driver = webdriver.Chrome()
+
+driver.get("http://localhost:8000/registration.html")
+
+driver.find_element(By.ID, "username").send_keys("John")
+
+driver.find_element(By.ID, "submit").click()
+
+print(driver.find_element(By.ID, "success").text)
+
+driver.quit()</xmp>
+<xmp class="c" data-f="CMD window 1">python -m http.server 8000</xmp>
+<xmp class="c" data-f="CMD window 2">python register.py</xmp>
+<h3>Q7(B) Validate input</h3>
+<xmp class="n" data-f="validation.html">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Validation Form</title>
+</head>
+<body>
+
+    <h2>Registration</h2>
+
+    <input type="text" id="username"
+           placeholder="Enter Username">
+
+    <button id="submit">Submit</button>
+
+    <p id="message"></p>
+
+    <script>
+        document.getElementById("submit").onclick =
+        function() {
+
+            let name =
+                document.getElementById("username").value;
+
+            if (name.length >= 3) {
+                document.getElementById("message").innerHTML =
+                    "Registration Successful";
+            } else {
+                document.getElementById("message").innerHTML =
+                    "Invalid Username";
+            }
+        };
+    </script>
+
+</body>
+</html></xmp>
+<xmp class="n" data-f="validate.py">
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+driver = webdriver.Chrome()
+
+driver.get("http://localhost:8000/validation.html")
+
+driver.find_element(By.ID, "username").send_keys("John")
+
+driver.find_element(By.ID, "submit").click()
+
+message = driver.find_element(By.ID, "message").text
+
+print("Message:", message)
+
+if message == "Registration Successful":
+    print("Test Passed")
+else:
+    print("Test Failed")
+
+driver.quit()</xmp>
+<xmp class="c" data-f="CMD window 1, server running">python -m http.server 8000</xmp>
+<xmp class="c" data-f="CMD window 2">python validate.py</xmp>
+
+<h2>SET 8: SELENIUM TESTING USING DOCKER</h2>
+<h3>Q8(A) Docker image for Selenium</h3>
+<xmp class="c">mkdir selenium-docker
+cd selenium-docker</xmp>
+<xmp class="n" data-f="requirements.txt">
+selenium</xmp>
+<xmp class="n" data-f="test.py">
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+options = webdriver.ChromeOptions()
+
+driver = webdriver.Remote(
+    command_executor="http://selenium:4444",
+    options=options
+)
+
+try:
+    driver.get("https://www.google.com")
+
+    print("Page Title:", driver.title)
+
+    assert "Google" in driver.title
+
+    print("Test Passed")
+
+finally:
+    driver.quit()</xmp>
+<xmp class="n" data-f="Dockerfile (no extension)">
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY test.py .
+
+CMD ["python", "test.py"]</xmp>
+<xmp class="c">docker build -t selenium-test .</xmp>
+<h3>Q8(B) Run tests inside Docker</h3>
+<xmp class="c" data-f="same folder">docker network create selenium-net
+docker run -d --name selenium --network selenium-net -p 4444:4444 selenium/standalone-chrome
+docker build -t selenium-test .
+docker run --rm --network selenium-net selenium-test
+docker ps</xmp>
+<xmp class="c" data-f="cleanup">docker stop selenium
+docker rm selenium</xmp>
+
+<h2>SET 9: RUN APPLICATION AND SELENIUM TESTS</h2>
+<h3>Q9(A) Containerized app with Selenium</h3>
+<xmp class="c">mkdir finalapp
+cd finalapp</xmp>
+<xmp class="n" data-f="index.html">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docker Selenium App</title>
+</head>
+<body>
+
+    <h1>Welcome to My Application</h1>
+
+    <button id="submit">Click Me</button>
+
+    <p id="message"></p>
+
+    <script>
+        document.getElementById("submit").onclick =
+        function() {
+            document.getElementById("message").innerHTML =
+                "Test Successful";
+        };
+    </script>
+
+</body>
+</html></xmp>
+<xmp class="n" data-f="Dockerfile (no extension)">
+FROM nginx:latest
+
+COPY index.html /usr/share/nginx/html/index.html
+
+EXPOSE 80</xmp>
+<xmp class="n" data-f="requirements.txt">
+selenium</xmp>
+<xmp class="n" data-f="test.py">
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+driver = None
+
+try:
+    for attempt in range(15):
+        try:
+            driver = webdriver.Remote(
+                command_executor="http://selenium:4444",
+                options=webdriver.ChromeOptions()
+            )
+            break
+        except Exception:
+            time.sleep(2)
+
+    if driver is None:
+        raise Exception("Selenium server is not ready")
+
+    driver.get("http://webapp")
+
+    print("Page Title:", driver.title)
+
+    driver.find_element(By.ID, "submit").click()
+
+    message = driver.find_element(By.ID, "message").text
+
+    print("Message:", message)
+
+    assert message == "Test Successful"
+
+    print("Test Passed")
+
+finally:
+    if driver:
+        driver.quit()</xmp>
+<xmp class="n" data-f="docker-compose.yml">
+services:
+
+  webapp:
+    build: .
+    container_name: webapp
+    ports:
+      - "8080:80"
+
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: selenium
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      - webapp
+      - selenium</xmp>
+<xmp class="n" data-f="Dockerfile.test">
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY test.py .
+
+CMD ["python", "test.py"]</xmp>
+<xmp class="c" data-f="run">docker compose up --build</xmp>
+<p class="b">Browser: http://localhost:8080</p>
+<xmp class="c" data-f="stop">docker compose down</xmp>
+<h3>Q9(B) Lab implementation report</h3>
+<p>Write this in your record book or Word (not a command).</p>
+<xmp class="n" data-f="record book">
+TITLE:
+Selenium Testing Using Docker
+
+AIM:
+To containerize an application and execute automated
+Selenium tests using Docker.
+
+SOFTWARE REQUIRED:
+1. Docker Desktop
+2. Selenium
+3. Python
+4. Google Chrome
+5. Notepad
+
+PROCEDURE:
+1. Create an HTML application.
+2. Create a Dockerfile.
+3. Build the Docker image.
+4. Create a Selenium testing script.
+5. Configure Docker Compose.
+6. Start application and Selenium containers.
+7. Execute automated tests.
+8. Verify the test results.
+
+RESULT:
+The application was successfully containerized
+and tested using Selenium automation.</xmp>
+
+<h2>Common mistakes</h2>
+<ul><li>Dockerfile must have no .txt at the end.</li><li>Always cd into the correct folder first.</li><li>Keep Docker Desktop running.</li></ul>
+<script>
+document.querySelectorAll('xmp').forEach(function(x){
+  var n=x.className==='n',f=x.dataset.f||'',t=x.textContent.replace(/^\n/,'');
+  var d=document.createElement('div');d.className='box '+x.className;
+  var l=document.createElement('div');l.className='lab';
+  var s=document.createElement('span');
+  s.textContent=n?'ENTER IN NOTEPAD'+(f?' → save as '+f:''):'COMMAND'+(f?' ('+f+')':'');
+  var b=document.createElement('button');b.textContent='Copy';
+  b.onclick=function(){try{navigator.clipboard.writeText(t);b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1200)}catch(e){}};
+  l.append(s,b);var p=document.createElement('pre');p.textContent=t;
+  d.append(l,p);x.replaceWith(d);
+});
+</script>
+</body></html>
