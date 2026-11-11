@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+<body>
+
+<h2>Student Registration Form</h2>
+
+<form onsubmit="register(event)">
+
+    First Name:
+    <input type="text" id="firstName" required>
+    <br><br>
+
+    Last Name:
+    <input type="text" id="lastName" required>
+    <br><br>
+
+    Email:
+    <input type="email" id="email" required>
+    <br><br>
+
+    Phone Number:
+    <input type="tel" id="phNo" required>
+    <br><br>
+
+    <button type="submit">Register</button>
+
+</form>
+
+<h3 id="message"></h3>
+
+<script>
+function register(event) {
+
+    event.preventDefault();
+
+    document.getElementById("message").innerHTML =
+    "Thank You For Registering :)";
+
+}
+</script>
+
+</body>
+
+
+
+
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+# Open Chrome
+driver = webdriver.Chrome()
+
+# Open registration form
+driver.get("file:///C:/SeleniumProject/EventRegistrationForm.html")
+
+# Enter student details
+driver.find_element(By.ID, "firstName").send_keys("Niharika")
+
+driver.find_element(By.ID, "lastName").send_keys("Katkam")
+
+driver.find_element(By.ID, "email").send_keys("niharika@gmail.com")
+
+driver.find_element(By.ID, "phNo").send_keys("9876543210")
+
+# Click Register button
+driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+
+# Display success message
+message = driver.find_element(By.ID, "message").text
+
+print("Registration Successful")
+print(message)
+
+# Close browser
+driver.quit()
+</html>
