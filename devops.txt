@@ -1,0 +1,1137 @@
+SET 1 – Introduction to Docker and Git
+Question A: Pull a base image and list active containers.
+1. What is Docker?
+Docker is a platform used to create, run and manage applications inside containers.
+
+Container: A lightweight environment that contains an application and everything required to run it.
+
+For example, we can download an Ubuntu image and run it inside a Docker container.
+2. Commands
+Step 1: Open Command Prompt.
+
+Check whether Docker is installed.
+docker --version
+
+Expected output:
+Docker version 29.x.x
+
+Step 2: Download a base image.
+docker pull ubuntu
+
+Explanation:
+- docker – Docker command.
+- pull – Downloads an image.
+- ubuntu – Image name.
+Step 3: Display downloaded images.
+docker images
+
+This displays all downloaded Docker images.
+
+Step 4: Create and run a container.
+docker run -it ubuntu
+
+Here:
+- run – Creates and starts a container.
+- -it – Interactive terminal.
+- ubuntu – Image name.
+Step 5: Exit the container.
+exit
+
+Step 6: List running containers.
+docker ps
+
+This displays currently running containers.
+
+Step 7: List all containers.
+docker ps -a
+
+This displays both running and stopped containers.
+Important commands to remember
+Command	Purpose
+docker --version	Check Docker version
+docker pull ubuntu	Download image
+docker images	List images
+docker run -it ubuntu	Run container
+docker ps	Show active containers
+docker ps -a	Show all containers
+docker stop ID	Stop container
+docker rm ID	Remove container
+
+
+Question B: Check Docker installation and verify its version.
+Step 1: Open CMD as Administrator.
+Step 2: Check Docker version.
+docker --version
+
+Step 3: Check Docker information.
+docker info
+
+This displays information about:
+- Containers
+- Images
+- Docker engine
+- Storage driver
+- Operating system
+Step 4: Check Docker Compose.
+docker compose version
+
+Step 5: Run a test container.
+docker run hello-world
+
+Expected output:
+Hello from Docker!
+
+This message confirms that Docker is working successfully.
+Step 6: List containers.
+docker ps -a
+
+Result: Docker installation and configuration were verified successfully.
+Viva: What is a hosted Git server, and how does it help teams manage source code?
+Answer:
+
+A hosted Git server is a platform that stores and manages source code online.
+
+Examples:
+- GitHub
+- GitLab
+- Bitbucket
+It helps developers:
+1. Store source code.
+2. Track code changes.
+3. Work together on projects.
+4. Maintain different versions of code.
+5. Share code with team members.
+Simple example:
+
+Suppose three developers are working on one project. Each developer can upload their code to GitHub, and all developers can access the latest project files.
+SET 2 – Creating a Docker Application
+Question A: Develop a simple containerized application using a custom Dockerfile.
+1. What is a Dockerfile?
+A Dockerfile is a text file containing instructions to create a Docker image.
+
+We will create a simple HTML application and run it using Docker.
+Step 1: Open your project folder.
+cd C:\Users\nihar\OneDrive\Attachments\25265A0519\devops
+
+Step 2: Create an HTML file.
+notepad index.html
+
+Write this code:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Docker Application</title>
+</head>
+<body>
+    <h1>Welcome to Docker!</h1>
+    <p>My first containerized application.</p>
+</body>
+</html>
+
+Save the file.
+Step 3: Create a Dockerfile.
+notepad Dockerfile
+
+Write:
+FROM nginx:latest
+
+COPY index.html /usr/share/nginx/html/index.html
+
+EXPOSE 80
+
+Explanation:
+Instruction	Meaning
+FROM	Selects the base image
+COPY	Copies application files
+EXPOSE	Specifies the application port
+
+
+Save the Dockerfile.
+
+Important: The file must be named Dockerfile, without a .txt extension.
+Question B: Build a Docker image with a custom tag and run it on a specific port.
+Step 1: Build the Docker image.
+docker build -t my-web-app .
+
+Explanation:
+- build – Builds an image.
+- -t – Assigns a name/tag.
+- my-web-app – Image name.
+- . – Current directory.
+Step 2: Check the image.
+docker images
+
+You should see:
+my-web-app
+
+Step 3: Run the container.
+docker run -d -p 8083:80 --name my-web-app-container my-web-app
+
+Explanation:
+- -d – Runs in the background.
+- -p 8083:80 – Maps host port 8083 to container port 80.
+- --name – Gives a name to the container.
+Step 4: Check running containers.
+docker ps
+
+Step 5: Open the browser.
+Enter:
+http://localhost:8083
+
+Expected output:
+
+Welcome to Docker!
+
+Your application is now running inside a Docker container.
+
+You have already worked with this approach in your DevOps practical using port 8083.
+Viva: What is the pull request model in GitLab?
+Answer:
+
+A pull request is a way for developers to propose changes to a project and request that those changes be reviewed and merged into the main branch.
+
+In GitLab, this is called a Merge Request.
+
+Steps:
+1. Developer creates a branch.
+2. Developer makes code changes.
+3. Developer pushes the branch to GitLab.
+4. Developer creates a Merge Request.
+5. Team members review the code.
+6. Approved changes are merged into the main branch.
+Purpose: It helps teams review code, identify errors and collaborate safely.
+SET 3 – Integrating Docker with Kubernetes
+Question A: Write configuration steps to integrate Kubernetes and Docker using local container images.
+1. What is Kubernetes?
+Kubernetes is a container orchestration platform.
+
+It helps us:
+- Manage containers.
+- Deploy applications.
+- Scale applications.
+- Restart failed containers.
+- Manage multiple containers.
+Difference:
+Docker	Kubernetes
+Creates and runs containers	Manages containerized applications
+Builds images	Deploys applications
+Runs individual containers	Manages multiple pods
+
+
+Step 1: Open Docker Desktop.
+Make sure Docker Desktop is running.
+Step 2: Enable Kubernetes.
+1. Open Docker Desktop.
+2. Go to Settings.
+3. Select Kubernetes.
+4. Enable Kubernetes.
+5. Click Apply and Restart.
+Wait until Kubernetes shows that it is running.
+Step 3: Verify Kubernetes installation.
+Open CMD.
+kubectl version --client
+
+Check the cluster:
+kubectl cluster-info
+
+Check nodes:
+kubectl get nodes
+
+Expected output should show a node with status:
+NAME             STATUS
+docker-desktop   Ready
+
+Step 4: Build a local Docker image.
+Go to your project folder.
+cd C:\Users\nihar\OneDrive\Attachments\25265A0519\devops
+
+Build:
+docker build -t my-web-app:v1 .
+
+Check:
+docker images
+
+Now the image is available locally.
+Question B: Write a simple container setup script for a Kubernetes environment.
+We can create a batch file to prepare the Docker application for Kubernetes.
+Step 1: Create a file.
+notepad setup.bat
+
+Write:
+@echo off
+
+echo Checking Docker...
+
+docker --version
+
+echo Building Docker Image...
+
+docker build -t my-web-app:v1 .
+
+echo Checking Kubernetes...
+
+kubectl get nodes
+
+echo Setup Completed Successfully!
+
+pause
+
+Save the file.
+Step 2: Execute the script.
+setup.bat
+
+The script:
+1. Checks Docker.
+2. Builds the Docker image.
+3. Checks Kubernetes nodes.
+4. Displays the completion message.
+Important: Kubernetes must be enabled and running before executing the Kubernetes commands.
+
+For local Kubernetes, we will use the image already available in Docker Desktop.
+Viva: What is job chaining in build pipelines and why is it used?
+Answer:
+
+Job chaining is the process of connecting multiple jobs in a pipeline so that one job executes after another job is completed successfully.
+
+Example:
+Source Code
+     |
+     v
+Build
+     |
+     v
+Testing
+     |
+     v
+Deployment
+
+Explanation:
+1. Build job compiles the application.
+2. Testing job checks for errors.
+3. Deployment job deploys the application.
+Why is it used?
+- Automates the development process.
+- Saves time.
+- Reduces manual work.
+- Ensures jobs execute in the correct order.
+SET 4 – Kubernetes Deployment and Service
+Question A: Write a Kubernetes YAML deployment configuration file.
+1. What is Deployment?
+A Kubernetes Deployment manages application Pods.
+
+A Pod is the smallest deployable unit in Kubernetes. It contains one or more containers.
+Step 1: Create a YAML file.
+Open CMD:
+notepad deployment.yaml
+
+Write:
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: my-web-deployment
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: my-web
+
+  template:
+    metadata:
+      labels:
+        app: my-web
+
+    spec:
+      containers:
+      - name: my-web-container
+        image: my-web-app:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+
+Save the file.
+Explanation
+Keyword	Meaning
+apiVersion	Kubernetes API version
+kind	Type of resource
+metadata	Deployment name
+replicas	Number of Pods
+selector	Identifies Pods
+containers	Container information
+image	Docker image name
+containerPort	Application port
+imagePullPolicy	Controls image downloading
+
+
+Here, imagePullPolicy: Never tells Kubernetes to use the locally available image instead of downloading it.
+Step 2: Apply the deployment.
+kubectl apply -f deployment.yaml
+
+Step 3: Check deployments.
+kubectl get deployments
+
+Step 4: Check Pods.
+kubectl get pods
+
+Expected output: Two Pods should be running.
+Question B: Write a Kubernetes service configuration file to expose the application externally.
+1. What is a Service?
+A Kubernetes Service provides a stable way to access Pods.
+
+It allows users to communicate with applications running inside Kubernetes.
+Step 1: Create a service YAML file.
+notepad service.yaml
+
+Write:
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: my-web-service
+
+spec:
+  type: NodePort
+
+  selector:
+    app: my-web
+
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+
+Save the file.
+Explanation
+Keyword	Meaning
+kind	Service
+type	NodePort
+selector	Selects application Pods
+port	Service port
+targetPort	Container port
+nodePort	External access port
+
+
+Step 2: Apply the service.
+kubectl apply -f service.yaml
+
+Step 3: Check the service.
+kubectl get services
+
+Step 4: Access the application.
+For a standard Docker Desktop Kubernetes setup, try:
+http://localhost:30080
+
+If it does not open, check the Service and NodePort configuration.
+Step 5: Check all resources.
+kubectl get all
+
+Result: The application is deployed using Kubernetes and exposed through a NodePort service.
+Viva: How do build servers manage build dependencies and plugins?
+Answer:
+
+Build servers are tools that automatically build and test software applications.
+
+Examples:
+- Jenkins
+- GitLab CI/CD
+- TeamCity
+They manage dependencies and plugins using configuration files and plugin management systems.
+
+Dependencies: External libraries required by an application.
+
+Plugins: Additional tools that extend build server functionality.
+
+For example, Jenkins uses plugins to integrate with Git, Docker and Maven.
+
+Build servers help to:
+1. Download required dependencies.
+2. Manage plugin versions.
+3. Automate builds.
+4. Detect errors.
+5. Improve software delivery.
+SET 5 – Selenium Installation and Browser Automation
+Question A: Install and explore Selenium by setting up the WebDriver environment.
+1. What is Selenium?
+Selenium is an open-source automation testing tool used to automate web browsers.
+
+It can:
+- Open websites.
+- Click buttons.
+- Enter text.
+- Submit forms.
+- Verify page titles.
+- Test web applications.
+Step 1: Check Java installation.
+Open CMD:
+java -version
+
+Check the compiler:
+javac -version
+
+You have already installed Java 17.
+Step 2: Install Selenium.
+You have already downloaded Selenium Java 4.52.0.
+
+Your folder:
+C:\Users\nihar\Downloads\selenium-java-4.52.0
+
+Step 3: Configure Selenium in NetBeans.
+1. Open NetBeans.
+2. Create a Java project.
+3. Right-click the project.
+4. Select Properties.
+5. Select Libraries.
+6. Click Add JAR/Folder.
+7. Add Selenium JAR files.
+8. Add all required JAR files from the lib folder.
+Step 4: Create a Java class.
+Create:
+SeleniumTest.java
+
+Write:
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+
+public class SeleniumTest {
+
+    public static void main(String[] args) {
+
+        WebDriver driver = new EdgeDriver();
+
+        driver.get("https://www.google.com");
+
+        System.out.println(driver.getTitle());
+
+        driver.quit();
+    }
+}
+
+Step 5: Run the program.
+Expected output:
+Google
+BUILD SUCCESSFUL
+
+You have already successfully executed this experiment.
+
+Note: The CDP version warning you previously received is not a build failure.
+Question B: Write a Selenium script to launch a browser, open a webpage and verify its title.
+Use this program:
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+
+public class TitleTest {
+
+    public static void main(String[] args) {
+
+        WebDriver driver = new EdgeDriver();
+
+        driver.get("https://www.google.com");
+
+        String title = driver.getTitle();
+
+        System.out.println("Page Title: " + title);
+
+        if (title.equals("Google")) {
+            System.out.println("Test Passed");
+        } else {
+            System.out.println("Test Failed");
+        }
+
+        driver.quit();
+    }
+}
+
+Expected output:
+Page Title: Google
+Test Passed
+
+Explanation
+- WebDriver – Controls the browser.
+- EdgeDriver – Opens Microsoft Edge.
+- get() – Opens a webpage.
+- getTitle() – Gets the webpage title.
+- quit() – Closes the browser.
+Viva: What are the key features of Selenium?
+Answer:
+
+Selenium is an open-source tool used for automated web application testing.
+
+Its important features are:
+1. Cross-browser testing: Supports Chrome, Firefox, Edge and Safari.
+2. Multiple languages: Supports Java, Python, JavaScript and C#.
+3. Automation: Automatically performs browser actions.
+4. Open-source: Free to use.
+5. WebDriver: Controls browser operations.
+6. Parallel testing: Supports running multiple tests simultaneously using Selenium Grid.
+SET 6 – JavaScript and Selenium Automation
+Question A: Write a simple program in JavaScript and perform testing using Selenium.
+Here we use JavaScript with Selenium WebDriver.
+Step 1: Check Node.js.
+Open CMD:
+node --version
+
+Check npm:
+npm --version
+
+If these commands are not recognized, install Node.js first.
+Step 2: Create a project folder.
+mkdir selenium-js
+
+cd selenium-js
+
+Step 3: Initialize the project.
+npm init -y
+
+This creates a package.json file.
+Step 4: Install Selenium.
+npm install selenium-webdriver
+
+Step 5: Create a JavaScript file.
+notepad test.js
+
+Write:
+const { Builder } = require('selenium-webdriver');
+
+async function test() {
+
+    let driver = await new Builder()
+        .forBrowser('MicrosoftEdge')
+        .build();
+
+    try {
+
+        await driver.get('https://www.google.com');
+
+        let title = await driver.getTitle();
+
+        console.log("Page Title:", title);
+
+        if (title === "Google") {
+            console.log("Test Passed");
+        } else {
+            console.log("Test Failed");
+        }
+
+    } finally {
+
+        await driver.quit();
+
+    }
+}
+
+test();
+
+Save the file.
+Step 6: Execute the program.
+node test.js
+
+Expected output:
+Page Title: Google
+Test Passed
+
+Selenium Manager can automatically manage the required browser driver in supported configurations.
+Question B: Locate a form element using its ID and click it.
+Step 1: Create an HTML file.
+notepad form.html
+
+Write:
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Student Registration</h2>
+
+<button id="submitBtn">Submit</button>
+
+<script>
+
+document.getElementById("submitBtn")
+.addEventListener("click", function() {
+
+    alert("Button Clicked Successfully!");
+
+});
+
+</script>
+
+</body>
+</html>
+
+Save the file.
+Step 2: Create a Selenium script.
+Create:
+notepad click.js
+
+Write:
+const { Builder, By } = require('selenium-webdriver');
+
+async function test() {
+
+    let driver = await new Builder()
+        .forBrowser('MicrosoftEdge')
+        .build();
+
+    try {
+
+        await driver.get(
+            'file:///C:/Users/nihar/OneDrive/Attachments/25265A0519/devops/form.html'
+        );
+
+        let button = await driver.findElement(
+            By.id("submitBtn")
+        );
+
+        await button.click();
+
+        console.log("Button clicked successfully");
+
+    } finally {
+
+        await driver.quit();
+
+    }
+}
+
+test();
+
+Save the file.
+Step 3: Execute.
+node click.js
+
+Expected output:
+Button clicked successfully
+
+Viva: How does JavaScript testing integrate with Selenium?
+Answer:
+
+JavaScript can be used with Selenium WebDriver to automate browser testing.
+
+The selenium-webdriver package provides functions to interact with browsers.
+
+It allows developers to:
+1. Open web pages.
+2. Locate HTML elements.
+3. Enter data.
+4. Click buttons.
+5. Verify results.
+6. Automate test cases.
+JavaScript Selenium scripts can be executed using Node.js.
+SET 7 – Selenium Form Testing and TDD
+Question A: Write a Selenium test script to input text into a registration form and submit it.
+We will use the registration form that you created for your DevOps practical.
+Step 1: Create the HTML registration form.
+Open CMD:
+cd C:\Users\nihar\OneDrive\Attachments\25265A0519\devops
+
+Create:
+notepad EventRegistrationForm.html
+
+Write:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+
+<body>
+
+<h2>Student Registration Form</h2>
+
+<form onsubmit="register(event)">
+
+    First Name:
+    <input type="text" id="firstName" required>
+    <br><br>
+
+    Last Name:
+    <input type="text" id="lastName" required>
+    <br><br>
+
+    Email:
+    <input type="email" id="email" required>
+    <br><br>
+
+    Phone Number:
+    <input type="tel" id="phNo" required>
+    <br><br>
+
+    <button type="submit">Register</button>
+
+</form>
+
+<h3 id="message"></h3>
+
+<script>
+
+function register(event) {
+
+    event.preventDefault();
+
+    document.getElementById("message").innerHTML =
+    "Thank You For Registering :)";
+
+}
+
+</script>
+
+</body>
+</html>
+
+Save the file.
+Step 2: Create a Selenium Java program.
+In NetBeans, create:
+StudentRegistrationTest.java
+
+Write:
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+
+public class StudentRegistrationTest {
+
+    public static void main(String[] args) {
+
+        WebDriver driver = new EdgeDriver();
+
+        try {
+
+            driver.get(
+                "file:///C:/Users/nihar/OneDrive/Attachments/25265A0519/devops/EventRegistrationForm.html"
+            );
+
+            driver.findElement(By.id("firstName"))
+                    .sendKeys("Niharika");
+
+            driver.findElement(By.id("lastName"))
+                    .sendKeys("Katkam");
+
+            driver.findElement(By.id("email"))
+                    .sendKeys("niharika@gmail.com");
+
+            driver.findElement(By.id("phNo"))
+                    .sendKeys("9876543210");
+
+            driver.findElement(
+                    By.cssSelector("button[type='submit']")
+            ).click();
+
+            System.out.println("Registration Successful");
+
+        } finally {
+
+            driver.quit();
+
+        }
+    }
+}
+
+Step 3: Run the program.
+Expected result:
+
+The browser opens the registration form, fills in all the fields and clicks Register.
+
+The webpage displays:
+Thank You For Registering :)
+
+Important: Your previous EventRegistrationForm.html file was empty. Make sure you save the HTML code before running Selenium.
+Question B: Validate user inputs and check the expected success message.
+We can modify the Selenium program to verify the registration result.
+
+Use:
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+
+public class ValidationTest {
+
+    public static void main(String[] args) {
+
+        WebDriver driver = new EdgeDriver();
+
+        try {
+
+            driver.get(
+                "file:///C:/Users/nihar/OneDrive/Attachments/25265A0519/devops/EventRegistrationForm.html"
+            );
+
+            driver.findElement(By.id("firstName"))
+                    .sendKeys("Niharika");
+
+            driver.findElement(By.id("lastName"))
+                    .sendKeys("Katkam");
+
+            driver.findElement(By.id("email"))
+                    .sendKeys("niharika@gmail.com");
+
+            driver.findElement(By.id("phNo"))
+                    .sendKeys("9876543210");
+
+            driver.findElement(
+                    By.cssSelector("button[type='submit']")
+            ).click();
+
+            String message = driver.findElement(
+                    By.id("message")
+            ).getText();
+
+            if (message.equals("Thank You For Registering :)")) {
+
+                System.out.println("Test Passed");
+
+            } else {
+
+                System.out.println("Test Failed");
+
+            }
+
+        } finally {
+
+            driver.quit();
+
+        }
+    }
+}
+
+Expected output:
+Test Passed
+
+This verifies whether the expected success message appears after registration.
+Viva: What is Test-Driven Development (TDD)?
+Answer:
+
+Test-Driven Development is a software development approach in which tests are written before writing the actual application code.
+
+TDD follows three main steps:
+
+1. Red: Write a test that initially fails.
+
+2. Green: Write the minimum code required to pass the test.
+
+3. Refactor: Improve the code without changing its functionality.
+
+Example:
+
+Suppose we are developing a registration form.
+1. First, write a test to check registration.
+2. Write the registration functionality.
+3. Run the test.
+4. Fix errors until the test passes.
+Purpose: TDD improves software quality and helps identify errors early.
+SET 8 – Selenium Containerization Using Docker
+Question A: Package a Selenium testing script and its dependencies inside a Docker container.
+1. What is Selenium containerization?
+Selenium containerization means running Selenium tests inside Docker containers instead of directly on the computer.
+
+Advantages:
+- Independent testing environment.
+- Easy setup.
+- Consistent execution.
+- Less dependency on local configurations.
+Step 1: Pull the Selenium Docker image.
+You have already downloaded this image:
+docker pull selenium/standalone-chrome:latest
+
+Step 2: Run Selenium inside Docker.
+docker run -d -p 4444:4444 --shm-size="2g" --name selenium-container selenium/standalone-chrome:latest
+
+Explanation:
+Command	Purpose
+-d	Background execution
+-p 4444:4444	Exposes Selenium server
+--shm-size	Provides shared memory
+--name	Container name
+
+
+Step 3: Check the container.
+docker ps
+
+Step 4: Open Selenium Grid.
+Open:
+http://localhost:4444
+
+You should see the Selenium Grid interface.
+Question B: Execute Selenium automated test cases inside an isolated container environment.
+We will create a Python Selenium test that connects to the Selenium Chrome container.
+Step 1: Create a test file.
+Create a folder:
+mkdir selenium-docker
+
+cd selenium-docker
+
+Create:
+notepad test.py
+
+Write:
+from selenium import webdriverfrom selenium.webdriver.common.by import Byoptions = webdriver.ChromeOptions()driver = webdriver.Remote(    command_executor="http://host.docker.internal:4444/wd/hub",    options=options)try:    driver.get("https://www.google.com")    print("Page Title:", driver.title)    if driver.title == "Google":        print("Test Passed")    else:        print("Test Failed")finally:    driver.quit()
+
+
+Save the file.
+Step 2: Create a Dockerfile.
+notepad Dockerfile
+
+Write:
+FROM python:3.14
+
+WORKDIR /app
+
+RUN pip install selenium
+
+COPY test.py .
+
+CMD ["python", "test.py"]
+
+Save it.
+Step 3: Build the testing image.
+docker build -t selenium-test .
+
+Step 4: Execute the Selenium test container.
+docker run --rm selenium-test
+
+Note: This test container needs access to the Selenium server running on your Windows host. Add this option to the command:
+--add-host=host.docker.internal:host-gateway
+
+The complete command is:
+docker run --rm --add-host=host.docker.internal:host-gateway selenium-test
+
+Expected output:
+Page Title: Google
+Test Passed
+
+Here, two containers work together:
+1. Selenium container – Opens and controls Chrome.
+2. Testing container – Executes the Python test script.
+Viva: What is the role of Ansible and Chef in system deployments?
+Answer:
+
+Ansible and Chef are configuration management tools used to automate server configuration and software deployment.
+
+Ansible:
+- Automates system configuration.
+- Uses YAML playbooks.
+- Can install and configure software.
+- Uses SSH for managing remote Linux systems.
+Chef:
+- Automates infrastructure configuration.
+- Uses recipes and cookbooks.
+- Defines how systems should be configured.
+Advantages:
+1. Reduces manual work.
+2. Saves time.
+3. Maintains consistency.
+4. Automates software installation.
+5. Simplifies server management.
+SET 9 – Running Applications and Selenium Tests Together
+Question A: Run a containerized application and execute Selenium tests against it.
+This question combines Docker and Selenium.
+
+We will run a web application inside one Docker container and test it using Selenium in another container.
+Step 1: Start the web application.
+Go to your existing project folder:
+cd C:\Users\nihar\OneDrive\Attachments\25265A0519\devops
+
+Build the application:
+docker build -t my-web-app .
+
+Run the application:
+docker run -d -p 8083:80 --name my-web-app-container my-web-app
+
+Check:
+docker ps
+
+Open:
+http://localhost:8083
+
+Your application should open.
+Step 2: Start the Selenium container.
+docker run -d -p 4444:4444 --shm-size="2g" --name selenium-container selenium/standalone-chrome:latest
+
+Check:
+docker ps
+
+Now both containers should be running.
+Step 3: Create the Selenium test script.
+Create:
+notepad test_application.py
+
+Write:
+from selenium import webdriveroptions = webdriver.ChromeOptions()driver = webdriver.Remote(    command_executor="http://localhost:4444/wd/hub",    options=options)try:    driver.get("http://host.docker.internal:8083")    print("Application Title:", driver.title)    if driver.title == "My Docker Application":        print("Application Test Passed")    else:        print("Application Test Failed")finally:    driver.quit()
+
+
+Save the file.
+Step 4: Execute the test.
+Since Python and Selenium are already installed on your Windows machine, run:
+python test_application.py
+
+Expected output:
+Application Title: My Docker Application
+Application Test Passed
+
+Explanation
+Here:
+- Docker runs the web application.
+- Selenium Docker runs Chrome.
+- Python executes the automation script.
+- Selenium accesses the application through its URL.
+- The test verifies the application title.
+Important: The Python test runs on Windows, so localhost:4444 is correct for connecting to the Selenium container. The browser runs inside the container, so it uses host.docker.internal:8083 to access your web application.
+Question B: Write a short lab implementation report summarizing Selenium containerization and automated testing.
+You can write the following in your practical record.
+Aim
+To containerize a web application and execute Selenium automated test cases using Docker.
+Software Requirements
+1. Docker Desktop
+2. Python
+3. Selenium WebDriver
+4. Selenium Standalone Chrome Image
+5. Windows Operating System
+Procedure
+1. Installed and configured Docker Desktop.
+2. Pulled the Selenium Standalone Chrome Docker image.
+3. Created a Docker container for the web application.
+4. Started the Selenium container on port 4444.
+5. Created a Python Selenium automation script.
+6. Connected Selenium WebDriver to the Selenium container.
+7. Accessed the web application using its URL.
+8. Verified the application title using Selenium.
+9. Executed the automated test successfully.
+Result
+Successfully containerized the web application using Docker and performed automated browser testing using Selenium WebDriver. The application was accessed and its title was verified successfully.
+
+
+
+Viva: What is a Chef recipe, and how does SaltStack manage configurations?
+Answer:
+
+1. What is a Chef recipe?
+
+A Chef recipe is a file containing instructions that define how a system should be configured.
+
+It can:
+- Install software.
+- Create files.
+- Start services.
+- Configure servers.
+Example:
+
+A Chef recipe can automatically install and start an Apache web server.
+
+2. What is SaltStack?
+
+SaltStack is a configuration management and automation tool used to manage multiple servers.
+
+It helps to:
+1. Install software.
+2. Manage configurations.
+3. Execute commands remotely.
+4. Monitor servers.
+5. Automate infrastructure management.
+Difference:
+Chef	SaltStack
+Uses recipes	Uses states
+Uses Ruby-based DSL	Uses YAML-based configuration
+Automates infrastructure	Automates infrastructure
+Uses cookbooks	Uses state files
