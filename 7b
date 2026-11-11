@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Validation</title>
+</head>
+<body>
+
+<h2>Student Registration</h2>
+
+<form id="form">
+
+    First Name:
+    <input type="text" id="firstName">
+    <br><br>
+
+    Phone Number:
+    <input type="text" id="phNo">
+    <br><br>
+
+    <button type="submit" id="submit">Register</button>
+
+</form>
+
+<h3 id="message"></h3>
+
+<script>
+document.getElementById("form").onsubmit = function(event) {
+
+    event.preventDefault();
+
+    let phone = document.getElementById("phNo").value;
+
+    if (phone.length == 10 && /^\d+$/.test(phone)) {
+
+        document.getElementById("message").innerHTML =
+        "Registration Successful";
+
+    } else {
+
+        document.getElementById("message").innerHTML =
+        "Invalid Phone Number";
+
+    }
+};
+</script>
+
+</body>
+</html>
+
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+# Open Chrome
+driver = webdriver.Chrome()
+
+# Open HTML form
+driver.get("file:///C:/SeleniumProject/ValidationForm.html")
+
+# Enter first name
+driver.find_element(By.ID, "firstName").send_keys("John")
+
+# Enter invalid phone number
+phone = driver.find_element(By.ID, "phNo")
+phone.send_keys("12345")
+
+# Click Register
+driver.find_element(By.ID, "submit").click()
+
+# Check invalid message
+message = driver.find_element(By.ID, "message").text
+
+print("Invalid Test:", message)
+
+# Clear phone number
+phone.clear()
+
+# Enter valid phone number
+phone.send_keys("9876543210")
+
+# Click Register again
+driver.find_element(By.ID, "submit").click()
+
+# Check success message
+message = driver.find_element(By.ID, "message").text
+
+print("Valid Test:", message)
+
+if message == "Registration Successful":
+    print("Test Passed")
+else:
+    print("Test Failed")
+
+# Close browser
+driver.quit()
